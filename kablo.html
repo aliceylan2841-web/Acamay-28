@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kablo Makara Hesaplayıcı Pro v3</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; margin: 0; padding: 10px; display: flex; justify-content: center; }
+        .container { width: 100%; max-width: 550px; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #1565c0; font-size: 20px; margin-bottom: 15px; border-bottom: 2px solid #e3f2fd; padding-bottom: 10px; }
+        .tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+        .tab-btn { flex: 1; padding: 10px; border: 1.5px solid #1565c0; border-radius: 8px; cursor: pointer; background: white; color: #1565c0; font-weight: bold; font-size: 14px; }
+        .tab-btn.active { background: #1565c0; color: white; }
+        .group { margin-bottom: 12px; }
+        label { display: block; margin-bottom: 5px; font-weight: 600; color: #444; font-size: 13px; }
+        input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 15px; outline: none; }
+        input:focus { border-color: #1565c0; }
+        .calc-btn { width: 100%; padding: 14px; background: #2e7d32; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        #sonuc { margin-top: 15px; padding: 12px; border-radius: 8px; text-align: left; font-size: 14px; display: none; line-height: 1.6; }
+        .success { background: #e8f5e9; color: #1b5e20; border: 1px solid #c8e6c9; }
+        .error { background: #ffebee; color: #b71c1c; border: 1px solid #ffcdd2; }
+        .info-row { display: flex; justify-content: space-between; border-bottom: 1px solid rgba(0,0,0,0.05); padding: 4px 0; }
+        
+        /* Yönetim Paneli */
+        .admin-panel { margin-top: 30px; border-top: 2px dashed #ddd; padding-top: 20px; }
+        .admin-title { font-size: 16px; color: #555; font-weight: bold; margin-bottom: 10px; }
+        .admin-inputs { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 5px; margin-bottom: 10px; }
+        .admin-inputs input { padding: 8px; font-size: 12px; }
+        .btn-row { display: flex; gap: 5px; margin-bottom: 15px; }
+        .add-btn { flex: 2; background: #ff8f00; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .update-btn { flex: 1; background: #1565c0; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; display: none; }
+        
+        .makara-scroll { max-height: 250px; overflow-y: auto; background: #fafafa; border: 1px solid #eee; border-radius: 6px; font-size: 12px; }
+        .m-item { padding: 10px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+        .m-info { flex-grow: 1; }
+        .m-actions { display: flex; gap: 5px; }
+        .edit-btn { background: #0288d1; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; }
+        .del-btn { background: #c62828; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Kablo Makara Hesaplayıcı Pro</h2>
+    
+    <div class="tabs">
+        <button id="btnYuvarlak" class="tab-btn active" onclick="setTur('yuvarlak')">Yuvarlak</button>
+        <button id="btnYassi" class="tab-btn" onclick="setTur('yassi')">Yassı</button>
+    </div>
+
+    <div id="yuvarlakAlan">
+        <div class="group">
+            <label>Dış Çap (mm)</label>
+            <input type="text" id="cap" placeholder="Örn: 12" inputmode="decimal">
+        </div>
+    </div>
+
+    <div id="yassiAlan" style="display:none;">
+        <div class="group">
+            <label>En (mm)</label>
+            <input type="text" id="en" placeholder="Örn: 30" inputmode="decimal">
+        </div>
+        <div class="group">
+            <label>Boy (mm)</label>
+            <input type="text" id="boy" placeholder="Örn: 10" inputmode="decimal">
+        </div>
+    </div>
+
+    <div class="group">
+        <label>Uzunluk (Metre)</label>
+        <input type="text" id="uzunluk" placeholder="Örn: 500" inputmode="decimal">
+    </div>
+
+    <div class="group">
+        <label>Tahmini Toplam Kablo Ağırlığı (kg)</label>
+        <input type="text" id="agirlik" placeholder="Ağırlık (kg)" inputmode="decimal">
+    </div>
+
+    <button class="calc-btn" onclick="hesapla()">HESAPLA</button>
+    
+    <div id="sonuc"></div>
+
+    <div class="admin-panel">
+        <div class="admin-title">Makara Listesini Yönet</div>
+        <div class="admin-inputs">
+            <input type="text" id="mAd" placeholder="Makara İsmi">
+            <input type="text" id="mHacim" placeholder="dm³" inputmode="decimal">
+            <input type="text" id="mKapasite" placeholder="Taşıma(kg)" inputmode="decimal">
+            <input type="text" id="mDara" placeholder="Dara(kg)" inputmode="decimal">
+        </div>
+        <div class="btn-row">
+            <button class="add-btn" id="btnEkle" onclick="makaraEkle()">LİSTEYE EKLE</button>
+            <button class="update-btn" id="btnGuncelle" onclick="makaraGuncelle()">GÜNCELLE</button>
+            <button class="update-btn" id="btnIptal" style="background:#757575" onclick="formTemizle()">İPTAL</button>
+        </div>
+
+        <div class="makara-scroll" id="mListeUI"></div>
+    </div>
+</div>
+
+<script>
+    let kabloTuru = 'yuvarlak';
+    let düzenlemeIndex = -1;
+
+    // Başlangıç Verileri
+    const varsayilanData = [
+        { ad: "KARTON 230x200x80", hacim: 4.665, kapasite: 10, dara: 0.75 },
+        { ad: "MDF 286x200x150", hacim: 5.972, kapasite: 20, dara: 1.00 },
+        { ad: "KARTON 266x200x80", hacim: 7.018, kapasite: 12, dara: 1.00 },
+        { ad: "MDF 333x200x150", hacim: 9.951, kapasite: 30, dara: 1.20 },
+        { ad: "MDF 333x300x150", hacim: 12.259, kapasite: 45, dara: 1.40 },
+        { ad: "MDF 388x300x150", hacim: 20.047, kapasite: 60, dara: 1.40 },
+        { ad: "MDF 444x300x150", hacim: 29.442, kapasite: 60, dara: 2.10 },
+        { ad: "MDF 488x350x150", hacim: 40.703, kapasite: 80, dara: 3.00 },
+        { ad: "MDF 544x400x200", hacim: 55.071, kapasite: 110, dara: 4.20 },
+        { ad: "MDF 588x400x200", hacim: 68.507, kapasite: 130, dara: 5.90 },
+        { ad: "AHŞAP 70", hacim: 92.691, kapasite: 650, dara: 25 },
+        { ad: "AHŞAP 80", hacim: 140.678, kapasite: 650, dara: 30 },
+        { ad: "AHŞAP 90", hacim: 181.845, kapasite: 900, dara: 35 },
+        { ad: "AHŞAP 100", hacim: 239.506, kapasite: 1100, dara: 45 },
+        { ad: "AHŞAP 110", hacim: 337.641, kapasite: 1450, dara: 65 },
+        { ad: "AHŞAP 120", hacim: 425.706, kapasite: 1800, dara: 75 },
+        { ad: "AHŞAP 130", hacim: 483.846, kapasite: 2000, dara: 100 },
+        { ad: "AHŞAP 140", hacim: 623.333, kapasite: 2500, dara: 120 },
+        { ad: "AHŞAP 150 (90cm GÖBEK)", hacim: 659.076, kapasite: 2801, dara: 160 },
+        { ad: "AHŞAP 150", hacim: 779.242, kapasite: 2800, dara: 160 },
+        { ad: "AHŞAP 160", hacim: 972.922, kapasite: 3000, dara: 185 },
+        { ad: "AHŞAP 180", hacim: 1282.527, kapasite: 3500, dara: 250 },
+        { ad: "AHŞAP 190", hacim: 1470.269, kapasite: 4000, dara: 300 },
+        { ad: "AHŞAP 200", hacim: 1583.366, kapasite: 4500, dara: 320 },
+        { ad: "AHŞAP 210", hacim: 1844.905, kapasite: 5000, dara: 350 },
+        { ad: "AHŞAP 220", hacim: 2049.894, kapasite: 5300, dara: 400 },
+        { ad: "AHŞAP 230", hacim: 2410.393, kapasite: 5500, dara: 420 },
+        { ad: "AHŞAP 240", hacim: 2764.608, kapasite: 6000, dara: 550 },
+        { ad: "AHŞAP 250", hacim: 3204.432, kapasite: 7000, dara: 650 }
+    ];
+
+    let makaralar = JSON.parse(localStorage.getItem('makaraData')) || varsayilanData;
+
+    function setTur(tur) {
+        kabloTuru = tur;
+        document.getElementById('yuvarlakAlan').style.display = tur === 'yuvarlak' ? 'block' : 'none';
+        document.getElementById('yassiAlan').style.display = tur === 'yassi' ? 'block' : 'none';
+        document.getElementById('btnYuvarlak').classList.toggle('active', tur === 'yuvarlak');
+        document.getElementById('btnYassi').classList.toggle('active', tur === 'yassi');
+    }
+
+    function parseNum(id) {
+        let val = document.getElementById(id).value.toString().replace(',', '.');
+        return parseFloat(val);
+    }
+
+    // LISTELEME
+    function listeYenile() {
+        const ui = document.getElementById('mListeUI');
+        ui.innerHTML = '';
+        makaralar.sort((a,b) => a.hacim - b.hacim).forEach((m, index) => {
+            ui.innerHTML += `
+                <div class="m-item">
+                    <div class="m-info">
+                        <b>${m.ad}</b><br>
+                        ${m.hacim.toFixed(2)} dm³ | Kap: ${m.kapasite}kg | Dara: ${m.dara}kg
+                    </div>
+                    <div class="m-actions">
+                        <button class="edit-btn" onclick="makaraDuzenleBasla(${index})">Düzenle</button>
+                        <button class="del-btn" onclick="makaraSil(${index})">Sil</button>
+                    </div>
+                </div>
+            `;
+        });
+        localStorage.setItem('makaraData', JSON.stringify(makaralar));
+    }
+
+    // EKLEME
+    function makaraEkle() {
+        const ad = document.getElementById('mAd').value;
+        const hacim = parseNum('mHacim');
+        const kapasite = parseNum('mKapasite');
+        const dara = parseNum('mDara');
+
+        if(!ad || isNaN(hacim) || isNaN(kapasite) || isNaN(dara)) return alert("Lütfen tüm alanları doldurun!");
+
+        makaralar.push({ ad, hacim, kapasite, dara });
+        formTemizle();
+        listeYenile();
+    }
+
+    // SILME
+    function makaraSil(index) {
+        if(confirm("Bu makarayı silmek istediğinize emin misiniz?")) {
+            makaralar.splice(index, 1);
+            listeYenile();
+        }
+    }
+
+    // DUZENLEME MODU
+    function makaraDuzenleBasla(index) {
+        const m = makaralar[index];
+        düzenlemeIndex = index;
+        document.getElementById('mAd').value = m.ad;
+        document.getElementById('mHacim').value = m.hacim;
+        document.getElementById('mKapasite').value = m.kapasite;
+        document.getElementById('mDara').value = m.dara;
+
+        document.getElementById('btnEkle').style.display = 'none';
+        document.getElementById('btnGuncelle').style.display = 'block';
+        document.getElementById('btnIptal').style.display = 'block';
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function makaraGuncelle() {
+        if(düzenlemeIndex === -1) return;
+        
+        makaralar[düzenlemeIndex] = {
+            ad: document.getElementById('mAd').value,
+            hacim: parseNum('mHacim'),
+            kapasite: parseNum('mKapasite'),
+            dara: parseNum('mDara')
+        };
+        
+        formTemizle();
+        listeYenile();
+    }
+
+    function formTemizle() {
+        düzenlemeIndex = -1;
+        document.getElementById('mAd').value = '';
+        document.getElementById('mHacim').value = '';
+        document.getElementById('mKapasite').value = '';
+        document.getElementById('mDara').value = '';
+        document.getElementById('btnEkle').style.display = 'block';
+        document.getElementById('btnGuncelle').style.display = 'none';
+        document.getElementById('btnIptal').style.display = 'none';
+    }
+
+    // HESAPLAMA
+    function hesapla() {
+        const sonucDiv = document.getElementById('sonuc');
+        try {
+            const L = parseNum('uzunluk');
+            const kg = parseNum('agirlik') || 0;
+            if (isNaN(L)) throw "Lütfen uzunluk giriniz!";
+            
+            let hacim = 0;
+            if (kabloTuru === 'yuvarlak') {
+                const cap = parseNum('cap');
+                if (isNaN(cap)) throw "Çap giriniz!";
+                hacim = (Math.pow(cap * 1.05, 2) * 0.7854 * L) / 1000;
+            } else {
+                const en = parseNum('en');
+                const boy = parseNum('boy');
+                if (isNaN(en) || isNaN(boy)) throw "En/Boy giriniz!";
+                hacim = (en * boy * L * 1.05) / 1000;
+            }
+
+            let uygunlar = makaralar
+                .filter(m => m.hacim >= hacim && m.kapasite >= kg)
+                .sort((a, b) => a.hacim - b.hacim);
+
+            sonucDiv.style.display = 'block';
+            if (uygunlar.length > 0) {
+                let m = uygunlar[0];
+                sonucDiv.className = 'success';
+                sonucDiv.innerHTML = `
+                    <div style="font-size:16px; margin-bottom:10px; border-bottom:1px solid #ccc"><b>Önerilen Makara: ${m.ad}</b></div>
+                    <div class="info-row"><span>Gereken Hacim:</span> <b>${hacim.toFixed(2)} dm³</b></div>
+                    <div class="info-row"><span>Makara Kapasitesi:</span> <b>${m.kapasite} kg</b></div>
+                    <div class="info-row"><span>Makara Dara:</span> <b>${m.dara} kg</b></div>
+                    <div class="info-row" style="margin-top:5px; color:#1565c0"><span>Brüt Toplam:</span> <b>${(kg + m.dara).toFixed(2)} kg</b></div>
+                `;
+            } else {
+                sonucDiv.className = 'error';
+                sonucDiv.innerHTML = `❌ Uygun makara bulunamadı! (Hacim: ${hacim.toFixed(2)} dm³ için kapasite yetersiz)`;
+            }
+        } catch (err) {
+            sonucDiv.style.display = 'block';
+            sonucDiv.className = 'error';
+            sonucDiv.innerHTML = err;
+        }
+    }
+
+    listeYenile();
+</script>
+
+</body>
+</html>
