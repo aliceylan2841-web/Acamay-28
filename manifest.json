@@ -1,0 +1,21 @@
+{
+  "name": "Makara Hesaplama",
+  "short_name": "ACAMAY",
+  "description": "LGS Gelişim ve Takip Sistemi",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#f4f7f9",
+  "theme_color": "#004a99",
+  "icons": [
+    {
+      "src": "https://i.ibb.co/84mb5gYg/file-00000000ce8c72439cfbe8e2985449ed.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://i.ibb.co/84mb5gYg/file-00000000ce8c72439cfbe8e2985449ed.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
