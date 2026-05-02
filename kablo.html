@@ -118,6 +118,32 @@
 <body>
 
 <div class="container">
+
+    <!-- Ölçü Rehberi Overlay -->
+    <div id="rehberOverlay" style="display:none; position:absolute; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.85); z-index:2000; padding:8px; overflow-y:auto;">
+        <div style="background:white; border-radius:10px; overflow:hidden; position:relative;">
+            <span onclick="rehberKapat()" style="position:absolute; top:10px; right:14px; font-size:28px; cursor:pointer; color:white; line-height:1; z-index:10; text-shadow:0 1px 4px rgba(0,0,0,0.8);">×</span>
+            <div style="text-align:center; font-size:14px; font-weight:900; color:#1565c0; letter-spacing:1px; margin-bottom:12px; border-bottom:2px solid #eee; padding:14px 16px 10px;">📐 MAKARA ÖLÇÜLERİ REHBERİ</div>
+            <img src="1000215891.png" alt="Makara Ölçüleri" style="width:100%; display:block; margin-bottom:0;">
+            <!-- Hacim Hesaplama -->
+            <div style="padding:14px 16px 16px;">
+            <div style="background:#f0f4ff; border:2px solid #1565c0; border-radius:10px; padding:12px;">
+                <div style="color:#1565c0; font-size:13px; font-weight:900; text-align:center; margin-bottom:10px; text-transform:uppercase;">📦 Ölçülerden Hacim Hesapla</div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+                    <div><label style="font-size:11px; font-weight:700; color:#444; display:block; margin-bottom:3px;">Dış Çap A (cm)</label><input type="number" id="rA" placeholder="0" inputmode="decimal" oninput="rehberHacimHesapla()" style="width:100%; padding:9px; border:1px solid #ccc; border-radius:6px; box-sizing:border-box; font-size:14px;"></div>
+                    <div><label style="font-size:11px; font-weight:700; color:#444; display:block; margin-bottom:3px;">Göbek Çapı D (cm)</label><input type="number" id="rD" placeholder="0" inputmode="decimal" oninput="rehberHacimHesapla()" style="width:100%; padding:9px; border:1px solid #ccc; border-radius:6px; box-sizing:border-box; font-size:14px;"></div>
+                    <div><label style="font-size:11px; font-weight:700; color:#444; display:block; margin-bottom:3px;">İç Genişlik C (cm)</label><input type="number" id="rC" placeholder="0" inputmode="decimal" oninput="rehberHacimHesapla()" style="width:100%; padding:9px; border:1px solid #ccc; border-radius:6px; box-sizing:border-box; font-size:14px;"></div>
+                    <div><label style="font-size:11px; font-weight:700; color:#444; display:block; margin-bottom:3px;">Boşluk Payı (cm)</label><input type="number" id="rBosluk" placeholder="20" value="20" inputmode="decimal" oninput="rehberHacimHesapla()" style="width:100%; padding:9px; border:1px solid #ccc; border-radius:6px; box-sizing:border-box; font-size:14px;"></div>
+                </div>
+                <div style="margin-top:10px; background:#1565c0; border-radius:8px; padding:10px 14px; display:flex; justify-content:space-between; align-items:center; color:white;">
+                    <span style="font-size:13px; font-weight:700;">Makara Hacmi</span>
+                    <b style="font-size:22px; color:#f1c40f;"><span id="rSonuc">0.00</span> <small style="font-size:12px; color:#ddd;">dm³</small></b>
+                </div>
+            </div>
+            </div><!-- /padding wrapper -->
+        </div>
+    </div>
+
     <div class="info-trigger" onclick="toggleInfo()">?</div>
     
     <div id="infoOverlay" class="info-overlay">
@@ -138,10 +164,10 @@
     </div>
 
     <div id="pageHesapla" class="page-content">
-        <h2>Makara Seçimi</h2>
+        <h2>Kablo Seçimi</h2>
         <div class="tabs">
-            <button id="btnYuvarlak" class="tab-btn active" onclick="setTur('yuvarlak')">Yuvarlak</button>
-            <button id="btnYassi" class="tab-btn" onclick="setTur('yassi')">Yassı</button>
+            <button id="btnYuvarlak" class="tab-btn active" onclick="setTur('Yuvarlak Kablo')">Yuvarlak Kablo</button>
+            <button id="btnYassi" class="tab-btn" onclick="setTur('yassi')">Yassı Kablo</button>
         </div>
         <div id="yuvarlakAlan">
             <div class="group">
@@ -161,6 +187,7 @@
 
     <div id="pageManual" class="page-content" style="display:none;">
         <h2>Manuel Kapasite Hesabı</h2>
+        <button onclick="document.getElementById('rehberOverlay').style.display='block'" style="width:100%; padding:10px; background:#e3f2fd; color:#1565c0; border:2px solid #1565c0; border-radius:8px; font-size:13px; font-weight:800; cursor:pointer; margin-bottom:10px;">📐 Ölçü Rehberi &amp; Hacim Hesapla</button>
         <div class="manual-row"><label>Kablo Çapı (mm)</label><input type="number" id="m_cap" placeholder="0" oninput="manuelHesapla()"></div>
         <div class="manual-row"><label>Tolerans Boşluğu (cm)</label><input type="number" id="m_tol" value="5" oninput="manuelHesapla()"></div>
         <div class="manual-row"><label>Makara Dış Çap (A) (cm)</label><input type="number" id="m_makA" placeholder="0" oninput="manuelHesapla()"></div>
@@ -178,6 +205,7 @@
 
     <div id="pageAdmin" class="page-content" style="display:none;">
         <h2>Makara Ekle / Düzenle</h2>
+        <button onclick="document.getElementById('rehberOverlay').style.display='block'" style="width:100%; padding:10px; background:#e3f2fd; color:#1565c0; border:2px solid #1565c0; border-radius:8px; font-size:13px; font-weight:800; cursor:pointer; margin-bottom:10px;">📐 Ölçü Rehberi &amp; Hacim Hesapla</button>
         <div class="admin-inputs">
             <input type="text" id="mAd" placeholder="Makara Adı">
             <input type="text" id="mHacim" placeholder="Hacim (dm³)" inputmode="decimal">
@@ -299,6 +327,7 @@
         document.getElementById('tabCalc').classList.toggle('active', page === 'hesapla');
         document.getElementById('tabManual').classList.toggle('active', page === 'manual');
         document.getElementById('tabAdmin').classList.toggle('active', page === 'admin');
+
         
         if(page === 'admin') listeYenile();
     }
@@ -436,6 +465,30 @@
     function temizleAdmin() {
         düzenlemeIndex = -1; document.querySelectorAll('#pageAdmin input').forEach(i => i.value = '');
         document.getElementById('btnEkle').style.display = 'block'; document.getElementById('btnGuncelle').style.display = 'none'; document.getElementById('btnIptal').style.display = 'none';
+    }
+
+    // Rehber overlay hacim hesabı — sonucu Admin mHacim alanına da yazar
+    function rehberHacimHesapla() {
+        const A = parseFloat(document.getElementById('rA').value) || 0;
+        const D = parseFloat(document.getElementById('rD').value) || 0;
+        const C = parseFloat(document.getElementById('rC').value) || 0;
+        const b = parseFloat(document.getElementById('rBosluk').value);
+        const bosluk = isNaN(b) ? 20 : b;
+        let sonuc = 0;
+        if (A > 0 && C > 0) {
+            const hacimCm3 = (Math.pow(A - bosluk, 2) - Math.pow(D, 2)) * 0.7854 * C;
+            sonuc = hacimCm3 > 0 ? hacimCm3 / 1000 : 0;
+        }
+        const sonucStr = sonuc.toFixed(2);
+        document.getElementById('rSonuc').innerText = sonucStr;
+        // Admin sayfasındaki Hacim alanına otomatik yaz
+        const mHacim = document.getElementById('mHacim');
+        if (mHacim) mHacim.value = sonucStr;
+    }
+
+    // Rehber kapatılınca değerleri sıfırla
+    function rehberKapat() {
+        document.getElementById('rehberOverlay').style.display = 'none';
     }
 
     // Uygulama açılışında listeyi yükle
